@@ -6,5 +6,5 @@
 
 // export * from "./globals";
 
-export { Table, View } from './/decorator/Entity';
-export {Connection} from "./connection/Connection";
+export { Table, View } from './src/decorator/Entity';
+export {Connection} from "./src/connection/Connection";
