@@ -5,7 +5,8 @@ import { RepositoryFactory } from '../repository/RepositoryFactory';
 import { JoiUtils } from '../util/JoiUtils';
 import { AsyncConstructor } from '../util/AsyncConstructor';
 import { OptionsParams, OptionsParamsSchema } from '../driver/types/DriverParams';
-import { findTableName } from "../util/globals";
+import { findTableName, getGlobalTablesObj } from "../util/globals";
+import { forOwn, keys } from 'lodash';
 
 /**
  * Connection is a single database ORM connection to a specific database.
@@ -57,6 +58,7 @@ export class Connection extends AsyncConstructor {
                 this.repositories = {};
                 //todo connect to db and generate schema, 
                 // use to check globalScope.tablesObj whether in the db or not when Connection Class init
+                await this.initRepositories();
                 this.metadata = {}
 
             } catch (err) {
@@ -95,7 +97,7 @@ export class Connection extends AsyncConstructor {
      */
 
     // getRepository<Entity>(target: EntityTarget<Entity>): Repository<Entity> {
-    async getRepository(target: any): Promise<any> {
+    getRepository(target: any): any {
         try {
             // check target -> key: name, if not in <globalScope.tablesObj>, exit
             let tableName = findTableName(target);
@@ -104,12 +106,34 @@ export class Connection extends AsyncConstructor {
                 return this.repositories[tableName];
             } else {
                 // if repository was not found then create it, store its instance and return it
-                const newRepository = await RepositoryFactory.create(this.options, this.connection, target);
-                this.repositories[tableName] = newRepository;
-                return newRepository;
+                // const newRepository = await RepositoryFactory.create(this.options, this.connection, target);
+                // this.repositories[tableName] = newRepository;
+                // return newRepository;
+                throw Error(`${JSON.stringify(target)} is not found in Connection.repositories. check is it in the Entity?`)
             }
         } catch (err) {
             console.log(`Connection::getRepository error: ${err}`);
+        }
+
+    }
+
+    // getRepository<Entity>(target: EntityTarget<Entity>): Repository<Entity> {
+    async initRepositories(): Promise<any> {
+        try {
+
+            console.log("getGlobalTablesObj(): ", getGlobalTablesObj());
+
+            if (keys(getGlobalTablesObj()).length < 1) {
+                throw Error(`initRepositories error: globalScope.tablesObj is null !!!`)
+            }
+
+            forOwn(getGlobalTablesObj(), async (value, key) => {
+                //todo check whether the table in the databse metaDatas
+                this.repositories[key] = await RepositoryFactory.create(this.options, this.connection, value.entityClass);
+            });
+
+        } catch (err) {
+            console.log(`Connection::initRepositories error: ${err}`);
         }
 
     }
