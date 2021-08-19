@@ -23,10 +23,13 @@ export function getGlobalTablesObj(): any {
 
 export function findTableName(entity: any) {
     //todo add check entity, just like check parames
+    if (!entity) {
+        throw Error(`global tools findTableName: entity can not be ${JSON.stringify(entity)} !!!`);
+    }
     let tableName = undefined;
     forOwn(getGlobalTablesObj(), (value, key) => {
         if (value.entityClass === entity) {
-            tableName = key; 
+            tableName = key;
         }
     });
 

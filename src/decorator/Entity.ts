@@ -8,19 +8,23 @@ import { getGlobalTablesObj } from "../util/globals";
 
 export function Table(tableName: string): any {
 
+    //todo add check the if tableName in the database,
+    //todo auto generate Entity from database
+    //get all tables use
+    //         SELECT
+    //   *
+    // FROM
+    //   all_views
+    // WHERE
+    //   view_name like upper('kl_cms_waredict_v');
+
+    //get table meatdatas use the extendMeta 
+
+    if (!!getGlobalTablesObj()[tableName]) {
+        throw Error(`Decorator Table name: ${tableName} 不允许重复!!! `)
+    }
+
     return function (prototype: any) {
-
-        //todo add check the if tableName in the database,
-        //todo auto generate Entity from database
-        //get all tables use
-        //         SELECT
-        //   *
-        // FROM
-        //   all_views
-        // WHERE
-        //   view_name like upper('kl_cms_waredict_v');
-
-        //get table meatdatas use the extendMeta 
 
         getGlobalTablesObj()[tableName] = {
             entityClass: prototype,
@@ -33,6 +37,10 @@ export function Table(tableName: string): any {
 
 
 export function View(tableName: string): any {
+
+    if (!!getGlobalTablesObj()[tableName]) {
+        throw Error(`Decorator View name: ${tableName} 不允许重复!!! `)
+    }
 
     return function (prototype: any) {
 

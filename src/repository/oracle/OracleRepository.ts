@@ -33,6 +33,9 @@ export class OracleRepository {
     constructor(_connection: any, _entity: any) {
         // super(async () => {
         try {
+            if (!_entity) {
+                throw Error(`constructor params::_entity can not be ${JSON.stringify(_entity)} !!!`);
+            }
             this.connection = _connection;
             this.entity = _entity;
             this.tableName = findTableName(_entity);
