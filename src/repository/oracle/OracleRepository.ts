@@ -260,6 +260,7 @@ export class OracleRepository {
                     //     [query.bindings[i].columnName]: { dir: oracledb.BIND_OUT }
                     // };
                     query.sql = _.replace(query.sql, `:${i + 1}`, `:${query.bindings[i].columnName}`);
+                    //todo  通过Entity 获取 返回字段的变量类型 用以生成 outBinds type
                     bindingsObj[query.bindings[i].columnName + ''] = { dir: oracledb.BIND_OUT };
                 } else {
                     bindingsObj[i + 1] = query.bindings[i];
@@ -314,17 +315,6 @@ export class OracleRepository {
                     bindingsObj[i + 1] = query.bindings[i];
                 }
             }
-
-            // console.log('bindingsObj: ', bindingsObj);
-
-            // if (!!options && !!options.returns && Array.isArray(options.returns)) {
-            //     // if(query.bindings[i])
-            //     let returningStr = ' returning';
-            //     for (let i = 0; i < options.returns.length; i++) {
-            //         returningStr = returningStr + ` "${options.returns[i]}" INTO :${options.returns[i]}`
-            //     }
-            //     query.sql = query.sql + returningStr;
-            // }
 
             const result = await this.executeSql({
                 sql: query.sql,
@@ -423,63 +413,30 @@ export class OracleRepository {
     async executeProcedure(params: executeProcedureParams) {
         try {
             await JoiUtils.checkParams(executeProcedureParamsSchema, params);
-            // let { filter, options } = params;
-            // let filterTemp = Object.assign({}, filter);
-            //todo 检查Entity attributes
-            // let { filter, sorts, options } = params;
-            // let tempQuery = this.queryBuilder(this.tableName);
-            // for (const key in filterTemp) {
-            //     const data = filterTemp[key];
-            //     if (Array.isArray(data)) {
-            //         // 数组参数，则‘in’
-            //         tempQuery = tempQuery.whereIn(key, data);
-            //         delete filterTemp[key];
-            //     } else if (!!data && typeof data === 'object') {
-            //         //todo 暂时不支持
-            //         /**
-            //         * 对象参数结构{opr, value}
-            //         * 支持：==, !=, <, <=, >, >=, IN, NOT IN, LIKE, =~, !~
-            //         * 注意: typeof null === 'object'
-            //         * 增加：opr = 'POSITION' 时需要处理数组属性的查询参数
-            //         */
-            //         delete filterTemp[key];
-            //     }
-            // }
+            let { binds, options } = params;
+            let bindsStr = '';
+            for (var key in binds) {
+                bindsStr = bindsStr + ` :${key},`;
+            }
+            bindsStr = bindsStr.slice(0, -1);
+            console.log('bindsStr:', bindsStr);
 
-            // if (Object.keys(filterTemp).length !== 0) {
-            //     tempQuery = tempQuery.where({
-            //         ...filterTemp
-            //     });
-            // }
-            // var schema = '';
-            // if (!!options && !!options.schema) {
-            //     schema = options.schema;
-            // }
-
-            //todo return can't work
-            // if (!!options && !!options.returns) {
-            //     tempQuery = tempQuery.returning(options.returns)
-            // }
-
+            var schema = '';
+            if (!!options && !!options.schema) {
+                schema = options.schema;
+            }
 
             const query = this.queryBuilder.raw(
                 `BEGIN
-                    CMSDTP.ZDSYJ_SCDD(:AS_INPTSTR, :AS_ISEXESQL, :AS_EXESQL, :AI_RTD, :AS_RMSG);
+                    "${schema}"."${this.tableName}"(${bindsStr});
                     COMMIT;
-                END;`
+                END;`,
             ).toSQL().toNative();
 
             console.log('query: ', query);
             const result = await this.executeSql({
                 sql: query.sql,
-                binds: {
-                    AS_INPTSTR: params.json,
-                    AS_ISEXESQL: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 2000 },
-                    AS_EXESQL: { dir: oracledb.BIND_OUT, type: oracledb.CLOB },
-                    AI_RTD: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-                    AS_RMSG: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 2000 },
-                },
-                // options: { autoCommit: true }
+                binds: binds
             });
 
             return result.rows;

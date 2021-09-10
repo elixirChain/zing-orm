@@ -76,11 +76,13 @@ export let DeletesByFilterParamsSchema = Joi.object({
 }).required();
 
 export interface executeProcedureParams {
-    json: string;
+    binds: object
+    options: Options;
 }
 
 export let executeProcedureParamsSchema = Joi.object({
-    json: Joi.string().required(),
+    binds: Joi.object().required(),
+    options: Joi.object(),
 }).required();
 
 export interface ExecuteSqlParams {
