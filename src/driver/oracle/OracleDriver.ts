@@ -28,7 +28,7 @@ export class OracleDriver implements Driver {
             connection = await this.dirver.getConnection({
                 user: _options.user,
                 password: _options.password,
-                connectString: `${_options.host}:${_options.port}/${_options.database}}`,
+                connectString: `${_options.host}:${_options.port}/${_options.database}`,
             });
         } catch (err) {
             console.error("获取 oracle connection 失败!!!", err);
