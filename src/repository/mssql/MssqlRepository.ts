@@ -19,11 +19,22 @@ import { findTableName } from "../../util/globals";
 import { knex } from 'knex';
 const oracledb = require('oracledb');
 const _ = require('lodash');
+var Request = require('tedious').Request;
+var TYPES = require('tedious').TYPES;
+
+//todo Entity @Column
+const MssqlTypes = {
+    number: TYPES.Numeric,
+    string: TYPES.VarChar,
+    date: TYPES.DateTime,
+}
+
+
 /**
  * Entity manager supposed to work with any entity, automatically find its repository and call its methods,
  * whatever entity type are you passing.
  */
-export class OracleRepository {
+export class MssqlRepository {
 
     // -------------------------------------------------------------------------
     // Public Properties
@@ -51,7 +62,7 @@ export class OracleRepository {
                 throw Error(`constructor params::_entity can not be ${JSON.stringify(_entity)} !!!`);
             }
             this.connection = _connection;
-            this.queryBuilder = knex({ client: 'oracledb' });
+            this.queryBuilder = knex({ client: 'mssql' });
             this.entity = _entity;
             this.tableName = findTableName(_entity);
         } catch (err) {
@@ -66,17 +77,58 @@ export class OracleRepository {
     // -------------------------------------------------------------------------
 
     async executeSql(params: ExecuteSqlParams): Promise<any> {
-        try {
-            await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
-            var { sql, binds = {}, options = {} } = params;
-            console.log("executeSql params: ", sql, binds, options);
-            let result = await this.connection.execute(sql, binds, options);
-            console.log("executeSql Query results: ");
-            console.dir(result);
-            return result;
-        } catch (err) {
-            console.log("executeSql error:", err);
-        }
+        return new Promise(async (resolve, reject) => {
+            try {
+                await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
+                var { sql, binds = {}, options = {} } = params;
+                console.log("executeSql params: ", sql, binds, options);
+                let rows = [];
+                let request = new Request(sql, (err, rowCount) => {
+
+                    this.connection.close();
+
+                    if (err) {
+                        reject(err);
+                    }
+
+                    let result = {
+                        rowCount,
+                        rows
+                    };
+
+                    console.log("executeSql Query results: ");
+                    console.dir(result);
+
+                    resolve(result);
+
+                });
+
+                if (JSON.stringify(binds) !== '{}') {
+                    for (var key in binds) {
+                        console.log("addParameter: p" + key + " = " + binds[key]);
+                        request.addParameter(`p${key}`, MssqlTypes[typeof binds[key]], binds[key]);
+
+                    }
+                }
+
+
+                request.on('row', function (row) {
+
+                    let newRow = _.reduce(row, function (a, k) {
+                        // console.log("_column: ", _column)
+                        a[k.metadata.colName] = k.value
+                        return a;
+                    }, {});
+                    rows.push(newRow);
+                });
+
+                this.connection.execSql(request);
+
+            } catch (err) {
+                console.log("executeSql error:", err);
+            }
+        });
+
     }
 
     // -------------------------------------------------------------------------
@@ -356,7 +408,6 @@ export class OracleRepository {
                     * 增加：opr = 'POSITION' 时需要处理数组属性的查询参数
                     */
                     tempQuery.where(`${key}`, data.opr, data.value)
-                    delete filterTemp[key];
                 }
             }
 

@@ -2,6 +2,7 @@
  * Factory used to create different types of repositories.
  */
 import { OracleRepository } from "./oracle/OracleRepository";
+import { MssqlRepository } from "./mssql/MssqlRepository";
 import { Repository } from "./Repository";
 import { OptionsParams, OptionsParamsSchema } from "../driver/types/DriverParams";
 import { JoiUtils } from "../util/JoiUtils";
@@ -43,6 +44,8 @@ export class RepositoryFactory {
                 //     return new ReactNativeDriver(connection);
                 // case "sqljs":
                 //     return new SqljsDriver(connection);
+                case "mssql":
+                    repository = await new MssqlRepository(connection, entity); break;
                 case "oracle":
                     repository = await new OracleRepository(connection, entity); break;
                 // case "mssql":
@@ -63,7 +66,7 @@ export class RepositoryFactory {
             return repository;
         } catch (err) {
             //todo
-            console.error(`RepositoryFactory create ${type} driver 失败!!!`, err);
+            console.error(`RepositoryFactory create ${type} repository 失败!!!`, err);
         }
     }
 

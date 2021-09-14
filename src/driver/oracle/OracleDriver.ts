@@ -25,7 +25,11 @@ export class OracleDriver implements Driver {
         //todo options 映射
         let connection: any;
         try {
-            connection = await this.dirver.getConnection(_options);
+            connection = await this.dirver.getConnection({
+                user: _options.user,
+                password: _options.password,
+                connectString: `${_options.host}:${_options.port}/${_options.database}}`,
+            });
         } catch (err) {
             console.error("获取 oracle connection 失败!!!", err);
             throw Error(`获取 oracle connection 失败!!!, 错误: ${err}`)
