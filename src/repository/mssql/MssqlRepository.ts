@@ -15,6 +15,7 @@ import {
     ExecuteSqlParamsSchema,
 } from '../types/RepositoryParams';
 import { JoiUtils } from '../../util/JoiUtils';
+import { CommonTools } from '../../util/CommonTools';
 import { findTableName } from "../../util/globals";
 import { knex } from 'knex';
 const oracledb = require('oracledb');
@@ -24,9 +25,9 @@ var TYPES = require('tedious').TYPES;
 
 //todo Entity @Column
 const MssqlTypes = {
-    number: TYPES.Numeric,
-    string: TYPES.VarChar,
-    date: TYPES.DateTime,
+    Number: TYPES.Numeric,
+    String: TYPES.VarChar,
+    Date: TYPES.DateTime,
 }
 
 
@@ -106,7 +107,7 @@ export class MssqlRepository {
                 if (JSON.stringify(binds) !== '{}') {
                     for (var key in binds) {
                         console.log("addParameter: p" + key + " = " + binds[key]);
-                        request.addParameter(`p${key}`, MssqlTypes[typeof binds[key]], binds[key]);
+                        request.addParameter(`p${key}`, MssqlTypes[CommonTools.getClass(binds[key])], binds[key]);
 
                     }
                 }
