@@ -9,8 +9,8 @@ import {
     SaveByFilterParamsSchema,
     DeletesByFilterParams,
     DeletesByFilterParamsSchema,
-    executeProcedureParams,
-    executeProcedureParamsSchema,
+    ExecuteProcedureParams,
+    ExecuteProcedureParamsSchema,
     ExecuteSqlParams,
     ExecuteSqlParamsSchema,
 } from '../types/RepositoryParams';
@@ -68,14 +68,23 @@ export class OracleRepository {
     async executeSql(params: ExecuteSqlParams): Promise<any> {
         try {
             await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
+            return await OracleRepository.executeSqlRaw(this.connection, params);
+        } catch (err) {
+            console.log("executeSql error:", err);
+        }
+    }
+
+    static async executeSqlRaw(connection: any, params: ExecuteSqlParams): Promise<any> {
+        try {
+            await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
             var { sql, binds = {}, options = {} } = params;
             console.log("executeSql params: ", sql, binds, options);
-            let result = await this.connection.execute(sql, binds, options);
+            let result = await connection.execute(sql, binds, options);
             console.log("executeSql Query results: ");
             console.dir(result);
             return result;
         } catch (err) {
-            console.log("executeSql error:", err);
+            console.log("executeSqlRaw error:", err);
         }
     }
 
@@ -414,9 +423,9 @@ export class OracleRepository {
         }
     }
 
-    async executeProcedure(params: executeProcedureParams) {
+    async executeProcedure(params: ExecuteProcedureParams) {
         try {
-            await JoiUtils.checkParams(executeProcedureParamsSchema, params);
+            await JoiUtils.checkParams(ExecuteProcedureParamsSchema, params);
             let { binds, options } = params;
             let bindsStr = '';
             for (var key in binds) {

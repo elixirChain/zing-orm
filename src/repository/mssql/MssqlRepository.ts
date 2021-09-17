@@ -9,8 +9,8 @@ import {
     SaveByFilterParamsSchema,
     DeletesByFilterParams,
     DeletesByFilterParamsSchema,
-    executeProcedureParams,
-    executeProcedureParamsSchema,
+    ExecuteProcedureParams,
+    ExecuteProcedureParamsSchema,
     ExecuteSqlParams,
     ExecuteSqlParamsSchema,
 } from '../types/RepositoryParams';
@@ -78,6 +78,15 @@ export class MssqlRepository {
     // -------------------------------------------------------------------------
 
     async executeSql(params: ExecuteSqlParams): Promise<any> {
+        try {
+            await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
+            return await MssqlRepository.executeSqlRaw(this.connection, params)
+        } catch (err) {
+            console.log("executeSql error:", err);
+        }
+    }
+
+    static async executeSqlRaw(connection: any, params: ExecuteSqlParams): Promise<any> {
         return new Promise(async (resolve, reject) => {
             try {
                 await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
@@ -85,8 +94,6 @@ export class MssqlRepository {
                 console.log("executeSql params: ", sql, binds, options);
                 let rows = [];
                 let request = new Request(sql, (err, rowCount) => {
-
-                    this.connection.close();
 
                     if (err) {
                         reject(err);
@@ -123,10 +130,10 @@ export class MssqlRepository {
                     rows.push(newRow);
                 });
 
-                this.connection.execSql(request);
+                connection.execSql(request);
 
             } catch (err) {
-                console.log("executeSql error:", err);
+                console.log("executeSqlRaw error:", err);
             }
         });
 
@@ -466,9 +473,9 @@ export class MssqlRepository {
         }
     }
 
-    async executeProcedure(params: executeProcedureParams) {
+    async executeProcedure(params: ExecuteProcedureParams) {
         try {
-            await JoiUtils.checkParams(executeProcedureParamsSchema, params);
+            await JoiUtils.checkParams(ExecuteProcedureParamsSchema, params);
             let { binds, options } = params;
             let bindsStr = '';
             for (var key in binds) {

@@ -7,7 +7,12 @@ import { AsyncConstructor } from '../util/AsyncConstructor';
 import { OptionsParams, OptionsParamsSchema } from '../driver/types/DriverParams';
 import { findTableName, getGlobalTablesObj } from "../util/globals";
 import { forOwn, keys } from 'lodash';
-
+import { OracleRepository } from '../repository/oracle/OracleRepository';
+import { MssqlRepository } from '../repository/mssql/MssqlRepository';
+import {
+    ExecuteSqlParams,
+    ExecuteSqlParamsSchema,
+} from '../repository/types/RepositoryParams';
 /**
  * Connection is a single database ORM connection to a specific database.
  * Its not required to be a database connection, depend on database type it can create connection pool.
@@ -95,6 +100,23 @@ export class Connection extends AsyncConstructor {
      * This method not necessarily creates database connection (depend on database type),
      * but it also can setup a connection pool with database to use.
      */
+
+    async executeSqlRaw(params: ExecuteSqlParams): Promise<any> {
+        try {
+            await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
+            let type = this.options.type;
+            switch (type) {
+                case "mssql":
+                    return await MssqlRepository.executeSqlRaw(this.connection, params);
+                case "oracle":
+                    return await OracleRepository.executeSqlRaw(this.connection, params);
+                default:
+                    throw new Error(`Connection ${type} executeSqlRaw is not found!`);
+            }
+        } catch (err) {
+            console.log("Connection executeSqlRaw error:", err);
+        }
+    }
 
     // getRepository<Entity>(target: EntityTarget<Entity>): Repository<Entity> {
     getRepository(target: any): any {

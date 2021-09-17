@@ -75,12 +75,12 @@ export let DeletesByFilterParamsSchema = Joi.object({
     options: Joi.object(),
 }).required();
 
-export interface executeProcedureParams {
+export interface ExecuteProcedureParams {
     binds: object
     options: Options;
 }
 
-export let executeProcedureParamsSchema = Joi.object({
+export let ExecuteProcedureParamsSchema = Joi.object({
     binds: Joi.object().required(),
     options: Joi.object(),
 }).required();
