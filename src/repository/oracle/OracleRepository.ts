@@ -288,7 +288,7 @@ export class OracleRepository {
                 options: { autoCommit: true }
             });
 
-            return result.rows;
+            return result.outBinds;
 
         } catch (err) {
             console.error("OracleRepository updatesByFilter 失败!!!", err);
@@ -334,7 +334,7 @@ export class OracleRepository {
                 options: { autoCommit: true }
             });
 
-            return result.rows;
+            return result.outBinds;
 
         } catch (err) {
             console.error("OracleRepository save 失败!!!", err);
@@ -415,7 +415,7 @@ export class OracleRepository {
                 options: { autoCommit: true }
             });
 
-            return result.rows;
+            return result.outBinds;
 
         } catch (err) {
             console.error("OracleRepository deletesByFilter 失败!!!", err);
@@ -452,7 +452,7 @@ export class OracleRepository {
                 binds: binds
             });
 
-            return result.rows;
+            return result.outBinds;
 
         } catch (err) {
             console.error("OracleRepository executeProcedure 失败!!!", err);
