@@ -68,7 +68,7 @@ export class MssqlRepository {
             this.tableName = findTableName(_entity);
         } catch (err) {
             //todo
-            console.error("初始化 OracleRepository Class 失败!!!", err);
+            console.error("初始化 MssqlRepository Class 失败!!!", err);
         }
         // })
     }
@@ -190,8 +190,8 @@ export class MssqlRepository {
                 list: result1.rows
             };
         } catch (err) {
-            console.error("OracleRepository getPage 失败!!!", err);
-            throw Error(`OracleRepository getPage 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository getPage 失败!!!", err);
+            throw Error(`MssqlRepository getPage 失败!!!, 错误: ${err}`)
         }
     }
 
@@ -256,8 +256,8 @@ export class MssqlRepository {
             return result.rows;
 
         } catch (err) {
-            console.error("OracleRepository getsByFilter 失败!!!", err);
-            throw Error(`OracleRepository getsByFilter 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository getsByFilter 失败!!!", err);
+            throw Error(`MssqlRepository getsByFilter 失败!!!, 错误: ${err}`)
         }
     }
 
@@ -342,8 +342,8 @@ export class MssqlRepository {
             return result.rows;
 
         } catch (err) {
-            console.error("OracleRepository updatesByFilter 失败!!!", err);
-            throw Error(`OracleRepository updatesByFilter 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository updatesByFilter 失败!!!", err);
+            throw Error(`MssqlRepository updatesByFilter 失败!!!, 错误: ${err}`)
         }
     }
 
@@ -388,8 +388,8 @@ export class MssqlRepository {
             return result.rows;
 
         } catch (err) {
-            console.error("OracleRepository save 失败!!!", err);
-            throw Error(`OracleRepository save 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository save 失败!!!", err);
+            throw Error(`MssqlRepository save 失败!!!, 错误: ${err}`)
         }
     }
 
@@ -468,8 +468,8 @@ export class MssqlRepository {
             return result.rows;
 
         } catch (err) {
-            console.error("OracleRepository deletesByFilter 失败!!!", err);
-            throw Error(`OracleRepository deletesByFilter 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository deletesByFilter 失败!!!", err);
+            throw Error(`MssqlRepository deletesByFilter 失败!!!, 错误: ${err}`)
         }
     }
 
@@ -505,8 +505,8 @@ export class MssqlRepository {
             return result.rows;
 
         } catch (err) {
-            console.error("OracleRepository executeProcedure 失败!!!", err);
-            throw Error(`OracleRepository executeProcedure 失败!!!, 错误: ${err}`)
+            console.error("MssqlRepository executeProcedure 失败!!!", err);
+            throw Error(`MssqlRepository executeProcedure 失败!!!, 错误: ${err}`)
         }
     }
 

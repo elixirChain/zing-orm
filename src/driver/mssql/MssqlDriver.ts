@@ -70,7 +70,7 @@ export class MssqlDriver implements Driver {
                 }
             } catch (err) {
                 console.error(err);
-                throw Error(`mssql oracle connection 失败!!!, 错误: ${err}`)
+                throw Error(`mssql mssql connection 失败!!!, 错误: ${err}`)
             }
         })
     }
