@@ -36,11 +36,11 @@ export class OracleDriver implements Driver {
                 process.env.PATH = process.env.PATH + path;
             }
             // this.dirver.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' });
-            console.warn('use default PATH C:\\oracle\\instantclient_19_11, you should check and install Visual Studio Redistributables.');
+            console.log(chalk.blueBright('[zing-orm]'), chalk.yellow('use default PATH C:\\oracle\\instantclient_19_11, you should check and install Visual Studio Redistributables.'));
         } else if (process.platform === 'darwin') { // macOS
             if (!process.env.LD_LIBRARY_PATH) {
                 process.env.LD_LIBRARY_PATH = '/Downloads/instantclient_19_8';
-                console.log(chalk.blueBright('[zing-orm]'),chalk.yellow('use default LD_LIBRARY_PATH /Downloads/instantclient_19_8'));
+                console.log(chalk.blueBright('[zing-orm]'), chalk.yellow('use default LD_LIBRARY_PATH /Downloads/instantclient_19_8'));
             }
             // this.dirver.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
         }
