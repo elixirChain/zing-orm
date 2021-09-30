@@ -7,7 +7,8 @@ export class OracleDriver implements Driver {
 
     readonly dirver = require('oracledb');
 
-    async getConnection(_options: OptionsParams) {
+
+    constructor() {
         // Using a fixed Oracle time zone helps avoid machine and deployment differences
         process.env.ORA_SDTZ = 'UTC';
         // On Windows and macOS, you can specify the directory containing the Oracle
@@ -15,18 +16,33 @@ export class OracleDriver implements Driver {
         // the system library search path must always be set before Node.js is started.
         // See the node-oracledb installation documentation.
         // If the search path is not correct, you will get a DPI-1047 error.
-        if (!process.env.LD_LIBRARY_PATH) {
-            if (process.platform === 'win32') { // Windows
-                process.env.LD_LIBRARY_PATH = 'C:\\oracle\\instantclient_19_11';
-                // this.dirver.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' });
-            } else if (process.platform === 'darwin') { // macOS
-                process.env.LD_LIBRARY_PATH = '/Downloads/instantclient_19_8';
-                // this.dirver.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
+
+        if (process.platform === 'win32') { // Windows
+            if (
+                process.env.PATH.indexOf('oracle') === -1 &&
+                process.env.PATH.indexOf('Oracle') === -1 &&
+                process.env.PATH.indexOf('ORACLE') === -1 &&
+                process.env.PATH.indexOf('instantclient') === -1 &&
+                process.env.PATH.indexOf('Instantclient') === -1 &&
+                process.env.PATH.indexOf('INSTANTCLIENT') === -1
+            ) {
+                process.env.PATH = process.env.PATH + 'C:\\oracle\\instantclient_19_11;';
             }
+            // this.dirver.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' });
+            console.log('use default PATH C:\\oracle\\instantclient_19_11, you should check and install Visual Studio Redistributables.');
+        } else if (process.platform === 'darwin') { // macOS
+            if (!process.env.LD_LIBRARY_PATH) {
+                process.env.LD_LIBRARY_PATH = '/Downloads/instantclient_19_8';
+                console.log('use default LD_LIBRARY_PATH /Downloads/instantclient_19_8');
+            }
+            // this.dirver.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
         }
+    }
+
+    async getConnection(_options: OptionsParams) {
         // Fetch each row as an object
         this.dirver.outFormat = this.dirver.OUT_FORMAT_OBJECT;
-        //todo options 映射
+        //todo options joi check
         let connection: any;
         try {
             connection = await this.dirver.getConnection({
