@@ -1,5 +1,6 @@
 import { Driver } from '../Driver';
 import { OptionsParams } from '../types/DriverParams';
+import * as chalk from 'chalk';
 
 export class OracleDriver implements Driver {
 
@@ -26,14 +27,20 @@ export class OracleDriver implements Driver {
                 process.env.PATH.indexOf('Instantclient') === -1 &&
                 process.env.PATH.indexOf('INSTANTCLIENT') === -1
             ) {
-                process.env.PATH = process.env.PATH + 'C:\\oracle\\instantclient_19_11;';
+
+                let path = '';
+                if (process.env.PATH.charAt(process.env.PATH.length - 1) !== ';') {
+                    path += ';'
+                }
+                path += 'C:\\oracle\\instantclient_19_11;';
+                process.env.PATH = process.env.PATH + path;
             }
             // this.dirver.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' });
-            console.log('use default PATH C:\\oracle\\instantclient_19_11, you should check and install Visual Studio Redistributables.');
+            console.warn('use default PATH C:\\oracle\\instantclient_19_11, you should check and install Visual Studio Redistributables.');
         } else if (process.platform === 'darwin') { // macOS
             if (!process.env.LD_LIBRARY_PATH) {
                 process.env.LD_LIBRARY_PATH = '/Downloads/instantclient_19_8';
-                console.log('use default LD_LIBRARY_PATH /Downloads/instantclient_19_8');
+                console.log(chalk.blueBright('[zing-orm]'),chalk.yellow('use default LD_LIBRARY_PATH /Downloads/instantclient_19_8'));
             }
             // this.dirver.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
         }
