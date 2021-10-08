@@ -7,6 +7,7 @@ export interface OptionsParams {
     host: string;
     port: string;
     database: string;
+    extraOptions: object;
 }
 
 export let OptionsParamsSchema = Joi.object({
@@ -16,4 +17,5 @@ export let OptionsParamsSchema = Joi.object({
     host: Joi.string().required(),
     port: Joi.string().required(),
     database: Joi.string().required(),
+    extraOptions: Joi.object(),
 }).required();

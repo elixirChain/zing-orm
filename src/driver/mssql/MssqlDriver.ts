@@ -10,6 +10,7 @@ export class MssqlDriver implements Driver {
     async getConnection(_options: OptionsParams) {
         return new Promise((resolve, reject) => {
             // Create connection to 
+            let extraOptions = !_options.extraOptions ? {} : _options.extraOptions;
             var config = {
                 server: _options.host,
                 authentication: {
@@ -22,9 +23,10 @@ export class MssqlDriver implements Driver {
                 options: {
                     port: Number(_options.port),
                     database: _options.database,
-                    cryptoCredentialsDetails: {
-                        minVersion: 'TLSv1'
-                    },
+                    ...extraOptions
+                    // cryptoCredentialsDetails: {
+                    //     minVersion: 'TLSv1'
+                    // },
                     // useColumnNames: false
                     // rowCollectionOnRequestCompletion: true
                 }
