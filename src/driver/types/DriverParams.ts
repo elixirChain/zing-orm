@@ -7,7 +7,7 @@ export interface OptionsParams {
     host: string;
     port: string;
     database: string;
-    extraOptions: object;
+    extraOptions?: object;
 }
 
 export let OptionsParamsSchema = Joi.object({
