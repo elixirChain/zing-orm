@@ -1,5 +1,6 @@
 import { OracleDriver } from "./oracle/OracleDriver";
 import { MssqlDriver } from "./mssql/MssqlDriver";
+import { ArangodbDriver } from "./arangodb/ArangodbDriver";
 import { Driver } from "./Driver";
 import { OptionsParams, OptionsParamsSchema } from "./types/DriverParams";
 import { JoiUtils } from "../util/JoiUtils";
@@ -44,6 +45,8 @@ export class DriverFactory {
                     return new MssqlDriver();
                 case "oracle":
                     return new OracleDriver();
+                case "arangodb":
+                    return new ArangodbDriver();
                 // case "mssql":
                 //     return new SqlServerDriver(connection);
                 // case "mongodb":

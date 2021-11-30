@@ -10,13 +10,14 @@
     "orm"
   ],
   "dependencies": {
+    "arangojs": "^7.6.1",
     "chalk": "^4.1.2",
     "joi": "^17.4.2",
     "knex": "^0.95.11",
     "lodash": "^4.17.21",
     "oracledb": "^5.2.0",
-    "tedious": "^12.2.0",
     "prettier": "^2.2.1",
+    "tedious": "^12.2.0",
     "typescript": "^4.4.2"
   },
   "devDependencies": {

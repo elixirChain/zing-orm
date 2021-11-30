@@ -11,7 +11,7 @@ export interface OptionsParams {
 }
 
 export let OptionsParamsSchema = Joi.object({
-    type: Joi.string().valid("oracle", "mssql").required(),
+    type: Joi.string().valid("oracle", "mssql", "arangodb").required(),
     user: Joi.string().required(),
     password: Joi.string().required(),
     host: Joi.string().required(),

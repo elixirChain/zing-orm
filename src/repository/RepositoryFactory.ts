@@ -3,6 +3,7 @@
  */
 import { OracleRepository } from "./oracle/OracleRepository";
 import { MssqlRepository } from "./mssql/MssqlRepository";
+import { ArangodbRepository } from "./arangodb/ArangodbRepository";
 import { Repository } from "./Repository";
 import { OptionsParams, OptionsParamsSchema } from "../driver/types/DriverParams";
 import { JoiUtils } from "../util/JoiUtils";
@@ -48,6 +49,8 @@ export class RepositoryFactory {
                     repository = await new MssqlRepository(connection, entity); break;
                 case "oracle":
                     repository = await new OracleRepository(connection, entity); break;
+                case "arangodb":
+                    repository = await new ArangodbRepository(connection, entity); break;
                 // case "mssql":
                 //     return new SqlServerDriver(connection);
                 // case "mongodb":

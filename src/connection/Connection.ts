@@ -9,6 +9,7 @@ import { findTableName, getGlobalTablesObj } from "../util/globals";
 import { forOwn, keys } from 'lodash';
 import { OracleRepository } from '../repository/oracle/OracleRepository';
 import { MssqlRepository } from '../repository/mssql/MssqlRepository';
+import { ArangodbRepository } from '../repository/arangodb/ArangodbRepository';
 import {
     ExecuteSqlParams,
     ExecuteSqlParamsSchema,
@@ -110,6 +111,8 @@ export class Connection extends AsyncConstructor {
                     return await MssqlRepository.executeSqlRaw(this.connection, params);
                 case "oracle":
                     return await OracleRepository.executeSqlRaw(this.connection, params);
+                case "arangodb":
+                    return await ArangodbRepository.executeSqlRaw(this.connection, params);
                 default:
                     throw new Error(`Connection ${type} executeSqlRaw is not found!`);
             }
