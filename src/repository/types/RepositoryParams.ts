@@ -55,13 +55,23 @@ export let UpdatesByFilterParamsSchema = Joi.object({
     options: Joi.object(),
 }).required();
 
-export interface SaveByFilterParams {
+export interface SaveParams {
     obj: object;
     options: Options;
 }
 
-export let SaveByFilterParamsSchema = Joi.object({
+export let SaveParamsSchema = Joi.object({
     obj: filterMinRequired.required(),
+    options: Joi.object(),
+}).required();
+
+export interface SavesParams {
+    objs: Array<object>;
+    options: Options;
+}
+
+export let SavesParamsSchema = Joi.object({
+    objs: Joi.array().items(filterMinRequired.required()).required(),
     options: Joi.object(),
 }).required();
 

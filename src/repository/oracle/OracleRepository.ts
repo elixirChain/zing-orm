@@ -5,8 +5,8 @@ import {
     GetsByFilterParamsSchema,
     UpdatesByFilterParams,
     UpdatesByFilterParamsSchema,
-    SaveByFilterParams,
-    SaveByFilterParamsSchema,
+    SaveParams,
+    SaveParamsSchema,
     DeletesByFilterParams,
     DeletesByFilterParamsSchema,
     ExecuteProcedureParams,
@@ -78,9 +78,9 @@ export class OracleRepository {
         try {
             await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
             var { sql, binds = {}, options = {} } = params;
-            console.log("executeSql params: ", sql, binds, options);
+            console.log("executeSqlRaw params: ", sql, binds, options);
             let result = await connection.execute(sql, binds, options);
-            console.log("executeSql Query results: ");
+            console.log("executeSqlRaw Query results: ");
             console.dir(result);
             return result;
         } catch (err) {
@@ -296,9 +296,9 @@ export class OracleRepository {
         }
     }
 
-    async save(params: SaveByFilterParams) {
+    async save(params: SaveParams) {
         try {
-            await JoiUtils.checkParams(SaveByFilterParamsSchema, params);
+            await JoiUtils.checkParams(SaveParamsSchema, params);
             let { obj, options } = params;
             //todo 检查Entity attributes
             let tempQuery = this.queryBuilder(this.tableName);

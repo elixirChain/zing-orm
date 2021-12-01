@@ -5,8 +5,8 @@ import {
     GetsByFilterParamsSchema,
     UpdatesByFilterParams,
     UpdatesByFilterParamsSchema,
-    SaveByFilterParams,
-    SaveByFilterParamsSchema,
+    SaveParams,
+    SaveParamsSchema,
     DeletesByFilterParams,
     DeletesByFilterParamsSchema,
     ExecuteProcedureParams,
@@ -91,7 +91,7 @@ export class MssqlRepository {
             try {
                 await JoiUtils.checkParams(ExecuteSqlParamsSchema, params);
                 var { sql, binds = {}, options = {} } = params;
-                console.log("executeSql params: ", sql, binds, options);
+                console.log("executeSqlRaw params: ", sql, binds, options);
                 let rows = [];
                 let request = new Request(sql, (err, rowCount) => {
 
@@ -104,7 +104,7 @@ export class MssqlRepository {
                         rows
                     };
 
-                    console.log("executeSql Query results: ");
+                    console.log("executeSqlRaw Query results: ");
                     console.dir(result);
 
                     resolve(result);
@@ -347,9 +347,9 @@ export class MssqlRepository {
         }
     }
 
-    async save(params: SaveByFilterParams) {
+    async save(params: SaveParams) {
         try {
-            await JoiUtils.checkParams(SaveByFilterParamsSchema, params);
+            await JoiUtils.checkParams(SaveParamsSchema, params);
             let { obj, options } = params;
             //todo 检查Entity attributes
             let tempQuery = this.queryBuilder(this.tableName);
