@@ -7,12 +7,16 @@ const filterMinRequired = Joi.object().min(1).pattern(/.*/, Joi.any().invalid(''
 export interface GetPageParams {
     current: number;
     pageSize: number;
+    filter: object;
+    sorts: object;
     options: Options;
 }
 
 export let GetPageParamsSchema = Joi.object({
     current: Joi.number().strict().integer().min(1).required(),
     pageSize: Joi.number().strict().integer().min(10).required(),
+    filter: Joi.object(),
+    sorts: Joi.object(),
     options: Joi.object(),
 }).required();
 

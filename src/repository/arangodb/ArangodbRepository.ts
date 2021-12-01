@@ -183,6 +183,58 @@ export class ArangodbRepository {
         return filterAql;
     }
 
+    /**
+    * 处理排序字符串（不含SORT）
+    * @param {object} sorts params
+    * @param {string} alias alias of collection
+    * @return {AQL} obj
+    */
+    private getSortFieldAqlList(sorts, alias?) {
+        // 默认别名为't'
+        if (!alias) {
+            alias = 't';
+        }
+        alias = aql.literal(alias);
+
+        // 默认时间倒序和_id倒序
+        const fieldAqlList = [ aql` ${alias}._create_date desc, ${alias}._id desc ` ];
+        // const fieldAqlList = [aql` ${alias}._id `];
+        if (sorts) {
+            // 删除默认排序
+            fieldAqlList.shift();
+            sorts && sorts.forEach((el) => {
+                if (!el.direction) {
+                    fieldAqlList.push(aql`${alias}.${el.field}`);
+                } else {
+                    fieldAqlList.push(aql`${alias}.${el.field} ${el.direction}`);
+                }
+            });
+        }
+        return fieldAqlList;
+    }
+
+
+    /**
+    * 拼装排序条件
+    * @param {array} sortFieldAqlList params
+    * @return {AQL} obj
+    */
+    private getSortAql(sortFieldAqlList) {
+        if (sortFieldAqlList && sortFieldAqlList.length > 0) {
+            // 添加到开头
+            const sorts = [aql` SORT`];
+            sorts.push(sortFieldAqlList[0]);
+            // 补逗号
+            for (let i = 1; i < sortFieldAqlList.length; i++) {
+                sorts.push(aql`, `);
+                sorts.push(sortFieldAqlList[i]);
+            }
+
+            sortFieldAqlList = sorts;
+        }
+        // 拼接完整sort AQL
+        return aql.join(sortFieldAqlList);
+    }
 
     /**
      * Find with pagination and condition.
@@ -202,6 +254,8 @@ export class ArangodbRepository {
             let {
                 current,
                 pageSize,
+                sorts,
+                filter
                 // options
             } = params;
 
@@ -210,15 +264,20 @@ export class ArangodbRepository {
             let count = pageSize;
 
             const collection = aql.literal(`${this.tableName}`);
+            const filterAql = this.getFilterAql(filter);
+            // 拼装排序条件 默认创建时间倒序
+            const sortAql = this.getSortAql(this.getSortFieldAqlList(sorts));
             // const collections = this.aql.literal(`${pluralize(this.getLowerCollectionName())}`);
             const query = aql`
                   LET ts = ( 
-                    FOR t IN ${collection} 
+                    FOR t IN ${collection}
+                        FILTER t._status == true ${filterAql}
+                        ${sortAql}
                     RETURN t
-                  ) 
+                  )
                   LET tsl = (
                     LET list = (
-                      FOR tl IN ts 
+                      FOR tl IN ts
                         LIMIT ${offset},${count} 
                       RETURN tl 
                     )
@@ -262,16 +321,19 @@ export class ArangodbRepository {
             await JoiUtils.checkParams(GetsByFilterParamsSchema, params);
             let {
                 filter,
+                sorts,
                 // options
             } = params;
 
             // 修改为使用FILTER可以利用索引
             const filterAql = this.getFilterAql(filter);
-
+            // 拼装排序条件 默认创建时间倒序
+            const sortAql = this.getSortAql(this.getSortFieldAqlList(sorts));
             const collection = aql.literal(`${this.tableName}`);
             const query = aql`
                   FOR t IN ${collection} 
                     FILTER t._status == true ${filterAql}
+                    ${sortAql}
                   RETURN t`;
 
             const rows = await this.executeSql({
@@ -365,7 +427,10 @@ export class ArangodbRepository {
     async deletesByFilter(params: DeletesByFilterParams) {
         try {
             await JoiUtils.checkParams(DeletesByFilterParamsSchema, params);
-            let { filter, options } = params;
+            let {
+                filter,
+                // options
+            } = params;
             const delete_date = moment().format('YYYY-MM-DD HH:mm:ss');
             const filterAql = this.getFilterAql(filter);
             const collection = aql.literal(`${this.tableName}`);
