@@ -199,7 +199,11 @@ export class ArangodbRepository {
     async getPage(params: GetPageParams) {
         try {
             await JoiUtils.checkParams(GetPageParamsSchema, params);
-            let { current, pageSize, options } = params;
+            let {
+                current,
+                pageSize,
+                // options
+            } = params;
 
             // 转换分页参数：pageNum,page_size => offset,count
             let offset = (current - 1) * pageSize;
@@ -256,7 +260,10 @@ export class ArangodbRepository {
     async getsByFilter(params: GetsByFilterParams) {
         try {
             await JoiUtils.checkParams(GetsByFilterParamsSchema, params);
-            let { filter, options } = params;
+            let {
+                filter,
+                // options
+            } = params;
 
             // 修改为使用FILTER可以利用索引
             const filterAql = this.getFilterAql(filter);
@@ -290,7 +297,11 @@ export class ArangodbRepository {
     async updatesByFilter(params: UpdatesByFilterParams) {
         try {
             await JoiUtils.checkParams(UpdatesByFilterParamsSchema, params);
-            let { filter, newObj, options } = params;
+            let {
+                filter,
+                newObj,
+                // options
+            } = params;
 
             const update_date = moment().format('YYYY-MM-DD HH:mm:ss');
             const filterAql = this.getFilterAql(filter);
@@ -322,7 +333,10 @@ export class ArangodbRepository {
     async saves(params: SavesParams) {
         try {
             await JoiUtils.checkParams(SavesParamsSchema, params);
-            let { objs, options } = params;
+            let {
+                objs,
+                // options
+            } = params;
             //todo 检查Entity attributes
             const create_date = moment().format('YYYY-MM-DD HH:mm:ss');
             const collection = aql.literal(`${this.tableName}`);
