@@ -47,6 +47,7 @@ export class ArangodbDriver implements Driver {
             console.error("获取 arangodb connection 失败!!!", err);
             throw Error(`获取 arangodb connection 失败!!!, 错误: ${err}`);
         }
+        // todo rewrite check connection succesful function here
         if (!!connection)
             console.log("获取 arangodb connection 成功.");
         return connection;

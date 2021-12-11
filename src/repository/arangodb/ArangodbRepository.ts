@@ -74,6 +74,8 @@ export class ArangodbRepository {
             return await ArangodbRepository.executeSqlRaw(this.connection, params)
         } catch (err) {
             console.log("executeSql error:", err);
+            throw Error(`executeSql failed!!!, error: ${err}`)
+
         }
     }
 
@@ -153,26 +155,28 @@ export class ArangodbRepository {
             let first = true;
             for (const key in filter) {
                 const data = filter[key];
-                if (Array.isArray(data)) {
-                    // 数组参数，则‘in’
-                    filterAqlList.push(aql` and ${alias}.${key} in ${data}`);
-                } else if (!!data && typeof data === 'object') {
-                    /**
-                     * 对象参数结构{opr, value}
-                     * 支持：==, !=, <, <=, >, >=, IN, NOT IN, LIKE, =~, !~
-                     * 注意: typeof null === 'object'
-                     * 增加：opr = 'POSITION' 时需要处理数组属性的查询参数
-                     */
-                    if (data.opr === 'POSITION') {
-                        arrayAttrAqlList.push(this.getArrayAttrAql(alias, key, data.value));
+                if (data !== undefined) {
+                    if (Array.isArray(data)) {
+                        // 数组参数，则‘in’
+                        filterAqlList.push(aql` and ${alias}.${key} in ${data}`);
+                    } else if (!!data && typeof data === 'object') {
+                        /**
+                         * 对象参数结构{opr, value}
+                         * 支持：==, !=, <, <=, >, >=, IN, NOT IN, LIKE, =~, !~
+                         * 注意: typeof null === 'object'
+                         * 增加：opr = 'POSITION' 时需要处理数组属性的查询参数
+                         */
+                        if (data.opr === 'POSITION') {
+                            arrayAttrAqlList.push(this.getArrayAttrAql(alias, key, data.value));
+                        } else {
+                            otherFilterAqlList.push(aql` and ${alias}.${key} ${aql.literal(data.opr)} ${data.value}`);
+                        }
                     } else {
-                        otherFilterAqlList.push(aql` and ${alias}.${key} ${aql.literal(data.opr)} ${data.value}`);
+                        // 单个参数，默认‘==’
+                        filterAqlList.push(aql` and ${alias}.${key} == ${data}`);
                     }
-                } else {
-                    // 单个参数，默认‘==’
-                    filterAqlList.push(aql` and ${alias}.${key} == ${data}`);
+                    if (first) first = false;
                 }
-                if (first) first = false;
             }
             // otherFilterAqlList在后，符合最左匹配原则
             filterAqlList = filterAqlList.concat(otherFilterAqlList).concat(arrayAttrAqlList);
@@ -197,7 +201,7 @@ export class ArangodbRepository {
         alias = aql.literal(alias);
 
         // 默认时间倒序和_id倒序
-        const fieldAqlList = [ aql` ${alias}._create_date desc, ${alias}._id desc ` ];
+        const fieldAqlList = [aql` ${alias}._create_date desc, ${alias}._id desc `];
         // const fieldAqlList = [aql` ${alias}._id `];
         if (sorts) {
             // 删除默认排序
@@ -341,7 +345,7 @@ export class ArangodbRepository {
                 binds: query.bindVars
             });
 
-            return rows[0];
+            return rows;
 
         } catch (err) {
             console.error("ArangodbRepository getsByFilter 失败!!!", err);
