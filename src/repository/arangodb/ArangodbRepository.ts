@@ -413,7 +413,7 @@ export class ArangodbRepository {
                     INTO ${collection} 
                   RETURN NEW._id
                 )
-                RETURN {_ids: tsl}`;
+                RETURN {ids: tsl}`;
 
             const rows = await this.executeSql({
                 sql: query.query,
